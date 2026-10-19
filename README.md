@@ -12,7 +12,19 @@ RRE is an engine for recursive revision: work is revised in rounds, each revisio
 
 ## What is implemented
 
-- The current prototype code, published with its history intact, exactly as developed.
+- [`SPEC.md`](SPEC.md) — the Prototype 0.1 specification and implementation contract, as delivered.
+- [`rre_minimal.py`](rre_minimal.py) — the reference implementation: a versioned working model, a revision loop (observe → propose → authority review → apply → verify), and a hash-chained JSONL audit log. Python 3.10+, standard library only.
+- [`test_rre_minimal.py`](test_rre_minimal.py) — the specification's own assertion suite: baseline failure, acknowledgment-without-revision, authorization gating, behavioral change, stage inspectability.
+- [`audit.jsonl`](audit.jsonl) — the audit artifact produced by the execution recorded below.
+
+## Execution record
+
+The specification was delivered unexecuted — its author stated plainly that the files had not been created or tested on their side. On publication, the files were saved exactly as delivered and run here:
+
+- 2026-10-18, Python 3.12.3: `python3 rre_minimal.py` → all three PASS lines, exit 0.
+- 2026-10-18, Python 3.12.3: `python3 test_rre_minimal.py` → `ALL ASSERTIONS PASSED`, exit 0.
+
+That verifies the delivered code runs and passes its own assertions. It is **not** an independent evaluation: the assertions are the specification's own, the cases are the demonstration cases, and no held-out or adversarial testing has been performed. See SPEC.md §F for what a real evaluation requires.
 
 ## What is missing or unverified
 
