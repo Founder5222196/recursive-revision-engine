@@ -1,134 +1,176 @@
-import json
-import hashlib
-from pathlib import Path
+"""Recursive Revision Engine prototype 0.1.
 
-def digest(value):
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(raw.encode()).hexdigest()
+A small, deterministic correction loop. Standard library only; Python 3.10+.
+The engine changes only its local working rule, never an underlying model or policy.
+"""
+from __future__ import annotations
+import hashlib
+import json
+from pathlib import Path
+from typing import Any
+
+
+def canonical(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def digest(value: Any) -> str:
+    return hashlib.sha256(canonical(value).encode("utf-8")).hexdigest()
+
 
 class RRE:
-    def __init__(self, audit_path="audit.jsonl"):
+    def __init__(self, audit_path: str | Path = "audit.jsonl"):
         self.path = Path(audit_path)
-        self.path.write_text("")
-        self.events = []
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text("", encoding="utf-8")
+        self.events: list[dict[str, Any]] = []
         self.version = 1
-        self.rules = {"missing_evidence": "guess"}
+        self.rules: dict[str, str] = {"missing_evidence": "guess"}
+        self.snapshots: dict[int, dict[str, str]] = {1: dict(self.rules)}
+        self._record("SESSION_STARTED", {"version": self.version, "rules": self.rules})
 
-    def record(self, stage, payload):
+    def _record(self, stage: str, payload: dict[str, Any]) -> dict[str, Any]:
         previous = self.events[-1]["hash"] if self.events else "GENESIS"
-        event = {
-            "sequence": len(self.events) + 1,
-            "stage": stage,
-            "payload": payload,
-            "previous_hash": previous,
-        }
+        event = {"sequence": len(self.events) + 1, "stage": stage,
+                 "payload": payload, "previous_hash": previous}
         event["hash"] = digest(event)
         self.events.append(event)
-        with self.path.open("a") as f:
-            f.write(json.dumps(event, sort_keys=True) + "\n")
+        with self.path.open("a", encoding="utf-8") as stream:
+            stream.write(canonical(event) + "\n")
+        return event
 
-    def act(self, evidence_missing):
-        action = (
-            self.rules["missing_evidence"]
-            if evidence_missing else "answer_from_evidence"
-        )
-        self.record("OBSERVE", {
-            "version": self.version,
-            "evidence_missing": evidence_missing,
-            "actual_action": action,
-        })
+    def act(self, evidence_missing: bool, evidence: str = "test evidence") -> str:
+        if evidence_missing:
+            action = self.rules["missing_evidence"]
+        else:
+            action = "answer_from_evidence"
+        self._record("OBSERVE", {"version": self.version, "input": {"evidence_missing": evidence_missing,
+                      "evidence": evidence}, "actual_action": action})
         return action
 
-    def acknowledge(self, correction):
-        self.record("ACKNOWLEDGMENT_ONLY", {
-            "correction": correction,
-            "version": self.version,
-        })
+    def identify(self, expected: str, actual: str, evidence: str) -> bool:
+        contradiction = expected != actual
+        self._record("IDENTIFY", {"contradiction": contradiction, "expected": expected,
+                      "actual": actual, "evidence": evidence,
+                      "alternatives": ["reasoning/model rule error", "missing information", "operational or authority constraint"]})
+        return contradiction
 
-    def propose(self):
-        proposal = {
-            "rule": "missing_evidence",
-            "old": self.rules["missing_evidence"],
-            "new": "report_unknown",
-            "target_version": self.version + 1,
-        }
-        self.record("PROPOSE_CHANGE", proposal)
+    def accept_correction(self, contribution: str, contributor: str, evidence: str,
+                          assessment: str = "supported in this controlled test") -> None:
+        self._record("ACCEPT_CORRECTION", {"contribution": contribution, "provenance": {"contributor": contributor},
+                      "evidence": evidence, "assessment": assessment,
+                      "scope_note": "Acceptance records the assessment; it does not itself change behavior."})
+
+    def acknowledge(self, correction: str) -> None:
+        self._record("ACKNOWLEDGMENT_ONLY", {"correction": correction, "version": self.version,
+                      "behavior_changed": False})
+
+    def propose(self) -> dict[str, Any]:
+        proposal = {"rule": "missing_evidence", "old": self.rules["missing_evidence"],
+                    "new": "report_unknown", "target_version": self.version + 1,
+                    "expected_behavior": "report_unknown when evidence is missing",
+                    "preserve_answerable_cases": True}
+        self._record("REVISE_MODEL", {"from_version": self.version, "candidate_rule": proposal["new"],
+                      "rationale": "Missing evidence must not be silently converted into a guess."})
+        self._record("PROPOSE_CHANGE", proposal)
         return proposal
 
-    def apply(self, proposal, approved_by=None):
-        if not approved_by:
-            self.record("REVIEW_AUTHORITY", {
-                "authorized": False,
-                "reason": "No explicit named approval",
-            })
+    def apply(self, proposal: dict[str, Any], approved_by: str | None = None) -> bool:
+        valid = (proposal.get("rule") == "missing_evidence"
+                 and proposal.get("target_version") == self.version + 1
+                 and proposal.get("old") == self.rules["missing_evidence"]
+                 and proposal.get("new") == "report_unknown")
+        authorized = bool(approved_by and approved_by.strip()) and valid
+        self._record("REVIEW_AUTHORITY", {"authorized": authorized, "reviewer": approved_by,
+                      "reason": "explicit named approval and current proposal" if authorized else
+                      ("missing explicit named approval" if not approved_by else "stale or mismatched proposal"),
+                      "next_step_authority": "named human reviewer"})
+        if not authorized:
             return False
-
-        if (proposal["target_version"] != self.version + 1
-                or proposal["old"] != self.rules["missing_evidence"]):
-            self.record("REVIEW_AUTHORITY", {
-                "authorized": False,
-                "reason": "Stale or mismatched proposal",
-            })
-            return False
-
-        before = dict(self.rules)
-        self.record("REVIEW_AUTHORITY", {
-            "authorized": True,
-            "approved_by": approved_by,
-            "proposal": proposal,
-        })
+        before = {"version": self.version, "rules": dict(self.rules)}
         self.rules[proposal["rule"]] = proposal["new"]
         self.version += 1
-        self.record("APPLY_AUTHORIZED_CHANGE", {
-            "before": before,
-            "after": dict(self.rules),
-            "version": self.version,
-        })
+        self.snapshots[self.version] = dict(self.rules)
+        self._record("APPLY_AUTHORIZED_CHANGE", {"before": before, "after": {"version": self.version,
+                      "rules": dict(self.rules)}, "approved_by": approved_by})
         return True
 
-    def verify(self):
-        actual = self.act(evidence_missing=True)
-        passed = actual == "report_unknown"
-        self.record("VERIFY", {
-            "expected": "report_unknown",
-            "actual": actual,
-            "passed": passed,
-        })
-        self.record(
-            "RETAIN" if passed else "ROLLBACK_REQUIRED",
-            {"version": self.version, "verified": passed},
-        )
+    def verify(self) -> bool:
+        missing_action = self.act(True, "held-out case: no supporting evidence")
+        answerable_action = self.act(False, "held-out case: supporting evidence available")
+        passed = missing_action == "report_unknown" and answerable_action == "answer_from_evidence"
+        self._record("VERIFY", {"tests": [
+            {"input": "missing evidence", "expected": "report_unknown", "actual": missing_action,
+             "passed": missing_action == "report_unknown"},
+            {"input": "evidence available", "expected": "answer_from_evidence", "actual": answerable_action,
+             "passed": answerable_action == "answer_from_evidence"}], "passed": passed})
+        self._record("RETAIN" if passed else "ROLLBACK", {"version": self.version, "verified": passed,
+                      "reason": "behavioral regression tests" if passed else "verification failed"})
+        if not passed:
+            self.rollback()
         return passed
 
+    def rollback(self) -> None:
+        previous_version = self.version - 1
+        if previous_version in self.snapshots:
+            before = dict(self.rules)
+            self.rules = dict(self.snapshots[previous_version])
+            old_version = self.version
+            self.version = previous_version
+            self._record("ROLLBACK_APPLIED", {"from_version": old_version, "to_version": self.version,
+                          "before": before, "after": dict(self.rules)})
+
+
+def verify_audit(path: str | Path) -> tuple[bool, str]:
+    previous = "GENESIS"
+    try:
+        lines = Path(path).read_text(encoding="utf-8").splitlines()
+        for expected_seq, line in enumerate(lines, 1):
+            event = json.loads(line)
+            if event.get("sequence") != expected_seq:
+                return False, f"sequence mismatch at line {expected_seq}"
+            if event.get("previous_hash") != previous:
+                return False, f"previous_hash mismatch at line {expected_seq}"
+            claimed = event.pop("hash", None)
+            if claimed != digest(event):
+                return False, f"event hash mismatch at line {expected_seq}"
+            previous = claimed
+        return True, f"verified {len(lines)} events"
+    except (OSError, ValueError, TypeError) as exc:
+        return False, f"audit unreadable: {exc}"
+
+
+def demo(audit_path: str | Path = "audit.jsonl") -> list[str]:
+    r = RRE(audit_path)
+    output = []
+    baseline = r.act(True)
+    output.append(f"Baseline action with missing evidence: {baseline}")
+    r.identify("report_unknown", baseline, "controlled input explicitly has no supporting evidence")
+    r.accept_correction("When evidence is missing, report uncertainty instead of guessing.",
+                         "independent-test-contributor", "baseline action was 'guess' on missing-evidence input")
+    r.acknowledge("I understand; I will report uncertainty.")
+    r.acknowledge("Correction accepted; I will do better.")
+    after_ack = r.act(True)
+    output.append(f"After two acknowledgments, action remains: {after_ack}")
+    detected = r.identify("report_unknown", after_ack, "behavioral probe after acknowledgments")
+    r._record("CLOSED_LOOP_DETECTED", {"detected": detected and after_ack == baseline,
+                "reason": "acknowledgment occurred without behavioral change"})
+    proposal = r.propose()
+    denied = r.apply(proposal)
+    output.append(f"Unauthorised apply blocked: {not denied}; current rule: {r.rules['missing_evidence']}")
+    applied = r.apply(proposal, approved_by="independent-test-reviewer")
+    verified = r.verify() if applied else False
+    output.append(f"Authorized local rule change applied: {applied}; version: {r.version}")
+    output.append(f"Held-out behavioral verification: {'PASS' if verified else 'FAIL'}")
+    chain_ok, chain_message = verify_audit(audit_path)
+    output.append(f"Audit hash-chain integrity: {'PASS' if chain_ok else 'FAIL'} ({chain_message})")
+    return output
+
 if __name__ == "__main__":
-    rre = RRE()
-
-    # Establish the failure.
-    assert rre.act(True) == "guess"
-
-    # Repeated acknowledgments must not count as revision.
-    rre.acknowledge("I should report uncertainty.")
-    rre.acknowledge("I understand and will do that.")
-    assert rre.act(True) == "guess"
-
-    # An independent behavioral test detects the unchanged behavior.
-    rre.record("CLOSED_LOOP_DETECTED", {
-        "detected": True,
-        "reason": "Acknowledgments occurred without behavioral change",
-    })
-
-    # Propose a narrow, testable revision.
-    proposal = rre.propose()
-
-    # Authority boundary: no approval, no change.
-    assert not rre.apply(proposal)
-    assert rre.act(True) == "guess"
-
-    # Explicit test authorization permits the local model change.
-    assert rre.apply(proposal, approved_by="test-reviewer")
-    assert rre.verify()
-
-    print("PASS: acknowledgment failure detected")
-    print("PASS: unauthorized change blocked")
-    print("PASS: authorized behavioral revision verified")
-    print("Audit:", rre.path.resolve())
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--audit", default="audit.jsonl", help="JSONL audit path")
+    args = parser.parse_args()
+    for line in demo(args.audit):
+        print(line)
+    print(f"Audit file: {Path(args.audit).resolve()}")

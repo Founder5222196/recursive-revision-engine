@@ -13,9 +13,10 @@ RRE is an engine for recursive revision: work is revised in rounds, each revisio
 ## What is implemented
 
 - [`SPEC.md`](SPEC.md) — the Prototype 0.1 specification and implementation contract, as delivered.
-- [`rre_minimal.py`](rre_minimal.py) — the reference implementation: a versioned working model, a revision loop (observe → propose → authority review → apply → verify), and a hash-chained JSONL audit log. Python 3.10+, standard library only.
-- [`test_rre_minimal.py`](test_rre_minimal.py) — the specification's own assertion suite: baseline failure, acknowledgment-without-revision, authorization gating, behavioral change, stage inspectability.
-- [`audit.jsonl`](audit.jsonl) — the audit artifact produced by the execution recorded below.
+- [`rre_minimal.py`](rre_minimal.py) — the reference implementation: a versioned working model, a revision loop (observe → propose → authority review → apply → verify), per-version rule snapshots, and a hash-chained JSONL audit log with a standalone chain verifier. Python 3.10+, standard library only.
+- [`test_rre_minimal.py`](test_rre_minimal.py) — four named tests: acknowledgment-is-not-revision, authority enforcement, stale proposals, and audit-chain tampering.
+- [`demo_audit.jsonl`](demo_audit.jsonl) — the author's shipped demonstration audit (18 hash-chained events).
+- [`audit.jsonl`](audit.jsonl) — the audit artifact produced by the local execution recorded below. It is byte-identical to `demo_audit.jsonl`: the demonstration is deterministic, and running the code reproduces the author's recorded chain exactly.
 
 ## Execution record
 
@@ -23,17 +24,18 @@ The specification was delivered unexecuted — its author stated plainly that th
 
 - 2026-10-18, Python 3.12.3: `python3 rre_minimal.py` → all three PASS lines, exit 0.
 - 2026-10-18, Python 3.12.3: `python3 test_rre_minimal.py` → `ALL ASSERTIONS PASSED`, exit 0.
+- 2026-10-19, Python 3.12.3: a revised Prototype 0.1 build (expanded implementation, four named tests, 18-event demonstration audit) was delivered and run here: demo exit 0 with all PASS lines; `python3 test_rre_minimal.py` → `ALL 4 TESTS PASSED`, exit 0. The audit produced by this run is byte-identical to the author's shipped `demo_audit.jsonl`.
 
-That verifies the delivered code runs and passes its own assertions. It is **not** an independent evaluation: the assertions are the specification's own, the cases are the demonstration cases, and no held-out or adversarial testing has been performed. See SPEC.md §F for what a real evaluation requires.
+That verifies the delivered code runs, passes its own tests, and reproduces its recorded demonstration exactly. It is **not** an independent evaluation: the tests are the implementation's own, the cases are the demonstration cases and the implementation's internal held-out probes, and no evaluator independent of the author has designed or run additional cases. See SPEC.md §F for what a real evaluation requires.
 
 ## What is missing or unverified
 
 Named plainly, so nobody has to guess:
 
 - **Audit-history reset** — not implemented.
-- **Real rollback** — not implemented.
-- **Authenticated authorization** — not implemented.
-- **Tests** — the test suite, where present, is **unverified**; no test result in this repository should be read as a passed verification until it is reported as one.
+- **Real rollback** — per-version rule snapshots exist in the implementation; a tested rollback path is not implemented.
+- **Authenticated authorization** — not implemented; `approved_by` is a named label, not an authenticated identity.
+- **Independent evaluation** — not performed. The test suite passes locally (see the execution record), but its cases are the implementation's own; the passing result is a reproduction, not an independent evaluation.
 
 ## Development
 
