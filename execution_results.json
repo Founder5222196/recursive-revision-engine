@@ -1,0 +1,20 @@
+[
+  {
+    "command": "python test_rre_minimal.py",
+    "exit_code": 0,
+    "stdout": "ALL 4 TESTS PASSED\n",
+    "stderr": ""
+  },
+  {
+    "command": "python -m unittest -v test_rre_heldout_eval.py",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "test_evaluator_catches_over_refusal (test_rre_heldout_eval.HeldoutEvaluatorTests.test_evaluator_catches_over_refusal) ... ok\ntest_existing_prototype_contract_remains_compatible (test_rre_heldout_eval.HeldoutEvaluatorTests.test_existing_prototype_contract_remains_compatible) ... ok\ntest_heldout_evaluator_checks_missing_and_answerable_cases (test_rre_heldout_eval.HeldoutEvaluatorTests.test_heldout_evaluator_checks_missing_and_answerable_cases) ... ok\ntest_runner_writes_report_and_valid_audit (test_rre_heldout_eval.HeldoutEvaluatorTests.test_runner_writes_report_and_valid_audit) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.005s\n\nOK\n"
+  },
+  {
+    "command": "python rre_heldout_eval.py --report heldout_report.json --audit heldout_audit.jsonl",
+    "exit_code": 0,
+    "stdout": "Independent evaluator: independent_black_box_v1\nHeld-out cases: 8/8 passed\nMissing-evidence cases: 4/4 passed\nAnswerable cases: 4/4 passed\nAudit chain: PASS (verified 13 events)\nReport: /mnt/data/rre_work/heldout_report.json\n",
+    "stderr": ""
+  }
+]

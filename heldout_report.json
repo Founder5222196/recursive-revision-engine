@@ -1,0 +1,99 @@
+{
+  "evaluator": "independent_black_box_v1",
+  "case_count": 8,
+  "passed_count": 8,
+  "pass_rate": 1.0,
+  "missing_evidence_passed": 4,
+  "missing_evidence_total": 4,
+  "answerable_passed": 4,
+  "answerable_total": 4,
+  "passed": true,
+  "cases": [
+    {
+      "case_id": "M01",
+      "input": {
+        "evidence_missing": true,
+        "evidence": ""
+      },
+      "expected": "report_unknown",
+      "actual": "report_unknown",
+      "passed": true
+    },
+    {
+      "case_id": "M02",
+      "input": {
+        "evidence_missing": true,
+        "evidence": "No source was supplied."
+      },
+      "expected": "report_unknown",
+      "actual": "report_unknown",
+      "passed": true
+    },
+    {
+      "case_id": "M03",
+      "input": {
+        "evidence_missing": true,
+        "evidence": "The available record is incomplete."
+      },
+      "expected": "report_unknown",
+      "actual": "report_unknown",
+      "passed": true
+    },
+    {
+      "case_id": "M04",
+      "input": {
+        "evidence_missing": true,
+        "evidence": "A claim is requested but no supporting material exists."
+      },
+      "expected": "report_unknown",
+      "actual": "report_unknown",
+      "passed": true
+    },
+    {
+      "case_id": "A01",
+      "input": {
+        "evidence_missing": false,
+        "evidence": "A verified source directly supports the answer."
+      },
+      "expected": "answer_from_evidence",
+      "actual": "answer_from_evidence",
+      "passed": true
+    },
+    {
+      "case_id": "A02",
+      "input": {
+        "evidence_missing": false,
+        "evidence": "Evidence is present and relevant."
+      },
+      "expected": "answer_from_evidence",
+      "actual": "answer_from_evidence",
+      "passed": true
+    },
+    {
+      "case_id": "A03",
+      "input": {
+        "evidence_missing": false,
+        "evidence": "The record contains a supported result."
+      },
+      "expected": "answer_from_evidence",
+      "actual": "answer_from_evidence",
+      "passed": true
+    },
+    {
+      "case_id": "A04",
+      "input": {
+        "evidence_missing": false,
+        "evidence": "The source has enough information to answer."
+      },
+      "expected": "answer_from_evidence",
+      "actual": "answer_from_evidence",
+      "passed": true
+    }
+  ],
+  "audit_chain_valid": true,
+  "audit_chain_message": "verified 13 events",
+  "audit_path": "heldout_audit.jsonl",
+  "version_tested": 2,
+  "rule_change_authority": "explicit test approval",
+  "claim_boundary": "Tests this deterministic local rule through its public action interface; does not establish learning by a general-purpose model or policy change."
+}
