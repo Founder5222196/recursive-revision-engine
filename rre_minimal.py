@@ -22,12 +22,79 @@ class RRE:
     def __init__(self, audit_path: str | Path = "audit.jsonl"):
         self.path = Path(audit_path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text("", encoding="utf-8")
+        self.state_path = self.path.with_name(self.path.name + ".state.json")
         self.events: list[dict[str, Any]] = []
         self.version = 1
         self.rules: dict[str, str] = {"missing_evidence": "guess"}
         self.snapshots: dict[int, dict[str, str]] = {1: dict(self.rules)}
-        self._record("SESSION_STARTED", {"version": self.version, "rules": self.rules})
+
+        # Existing audit logs are append-only: validate and load the chain before
+        # recording anything new. Never truncate an existing history.
+        if (self.path.exists() and self.path.stat().st_size) or self.state_path.exists():
+            if self.path.exists() and self.path.stat().st_size:
+                self.events = self._load_audit_events()
+            self._restore_state()
+            self._record("SESSION_STARTED", {"version": self.version, "rules": dict(self.rules),
+                                               "resumed": True})
+        else:
+            # Preserve the original fresh-path behavior and event vocabulary.
+            self._record("SESSION_STARTED", {"version": self.version, "rules": self.rules})
+            self._persist_state()
+
+    def _load_audit_events(self) -> list[dict[str, Any]]:
+        loaded: list[dict[str, Any]] = []
+        previous = "GENESIS"
+        for expected_seq, line in enumerate(self.path.read_text(encoding="utf-8").splitlines(), 1):
+            event = json.loads(line)
+            claimed = event.get("hash")
+            body = dict(event)
+            body.pop("hash", None)
+            if event.get("sequence") != expected_seq or event.get("previous_hash") != previous or claimed != digest(body):
+                raise ValueError(f"cannot resume: invalid audit chain at line {expected_seq}")
+            loaded.append(event)
+            previous = claimed
+        return loaded
+
+    def _restore_state(self) -> None:
+        # The sidecar is the primary durable state. If absent (e.g. copied audit
+        # file), reconstruct the latest known rules/version from audit events.
+        if self.state_path.exists():
+            state = json.loads(self.state_path.read_text(encoding="utf-8"))
+            rules, version = state.get("rules"), state.get("version")
+            if not isinstance(rules, dict) or not isinstance(version, int) or version < 1:
+                raise ValueError("cannot resume: malformed durable state")
+            self.rules = {str(k): str(v) for k, v in rules.items()}
+            self.version = version
+        else:
+            for event in self.events:
+                payload = event.get("payload", {})
+                if event.get("stage") == "APPLY_AUTHORIZED_CHANGE":
+                    after = payload.get("after", {})
+                    if isinstance(after.get("version"), int) and isinstance(after.get("rules"), dict):
+                        self.version = after["version"]
+                        self.rules = dict(after["rules"])
+                elif event.get("stage") == "ROLLBACK_APPLIED":
+                    if isinstance(payload.get("to_version"), int) and isinstance(payload.get("after"), dict):
+                        self.version = payload["to_version"]
+                        self.rules = dict(payload["after"])
+        # Rebuild available rollback snapshots from the chronological state events.
+        self.snapshots = {1: {"missing_evidence": "guess"}}
+        for event in self.events:
+            payload = event.get("payload", {})
+            if event.get("stage") == "APPLY_AUTHORIZED_CHANGE":
+                after = payload.get("after", {})
+                if isinstance(after.get("version"), int) and isinstance(after.get("rules"), dict):
+                    self.snapshots[after["version"]] = dict(after["rules"])
+            elif event.get("stage") == "ROLLBACK_APPLIED":
+                if isinstance(payload.get("to_version"), int) and isinstance(payload.get("after"), dict):
+                    self.snapshots[payload["to_version"]] = dict(payload["after"])
+        self.snapshots[self.version] = dict(self.rules)
+
+    def _persist_state(self) -> None:
+        state = {"version": self.version, "rules": self.rules}
+        temp = self.state_path.with_name(self.state_path.name + ".tmp")
+        temp.write_text(canonical(state) + "\n", encoding="utf-8")
+        temp.replace(self.state_path)
 
     def _record(self, stage: str, payload: dict[str, Any]) -> dict[str, Any]:
         previous = self.events[-1]["hash"] if self.events else "GENESIS"
@@ -93,6 +160,7 @@ class RRE:
         self.snapshots[self.version] = dict(self.rules)
         self._record("APPLY_AUTHORIZED_CHANGE", {"before": before, "after": {"version": self.version,
                       "rules": dict(self.rules)}, "approved_by": approved_by})
+        self._persist_state()
         return True
 
     def verify(self) -> bool:
@@ -119,6 +187,7 @@ class RRE:
             self.version = previous_version
             self._record("ROLLBACK_APPLIED", {"from_version": old_version, "to_version": self.version,
                           "before": before, "after": dict(self.rules)})
+            self._persist_state()
 
 
 def verify_audit(path: str | Path) -> tuple[bool, str]:
