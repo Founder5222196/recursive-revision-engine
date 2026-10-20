@@ -1,0 +1,287 @@
+{
+  "evaluator": "ota-independent-evaluator",
+  "target": "Founder5222196/recursive-revision-engine @ 862fa5a9714709980ee269b624a6308360de2ae2",
+  "method": "black-box, public interfaces only",
+  "total": 39,
+  "passed": 37,
+  "failed": 2,
+  "failed_case_ids": [
+    "D6",
+    "D7"
+  ],
+  "cases": [
+    {
+      "case_id": "A1",
+      "description": "Baseline: fresh agent guesses on missing evidence",
+      "expected": "guess (the documented faulty rule)",
+      "actual": "'guess'",
+      "passed": true
+    },
+    {
+      "case_id": "A2",
+      "description": "Two acknowledgments do not change behavior",
+      "expected": "guess (acknowledgment alone must not change behavior)",
+      "actual": "'guess'",
+      "passed": true
+    },
+    {
+      "case_id": "A3",
+      "description": "Apply without named approval is rejected; behavior unchanged",
+      "expected": "apply returns False; behavior stays 'guess'",
+      "actual": "apply=False, act='guess'",
+      "passed": true
+    },
+    {
+      "case_id": "A4",
+      "description": "Authorized apply of the correction succeeds",
+      "expected": "True",
+      "actual": "True",
+      "passed": true
+    },
+    {
+      "case_id": "A5",
+      "description": "Missing-evidence case 1/4: must report uncertainty",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "A6",
+      "description": "Missing-evidence case 2/4: must report uncertainty",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "A7",
+      "description": "Missing-evidence case 3/4: must report uncertainty",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "A8",
+      "description": "Missing-evidence case 4/4: must report uncertainty",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "A9",
+      "description": "Rich-looking text is still treated as missing when the flag says so",
+      "expected": "report_unknown (per the public interface contract the evidence_missing flag governs the action)",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "A10",
+      "description": "Answerable case 1/4: must still answer from evidence",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "A11",
+      "description": "Answerable case 2/4: must still answer from evidence",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "A12",
+      "description": "Answerable case 3/4: must still answer from evidence",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "A13",
+      "description": "Answerable case 4/4: must still answer from evidence",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "A14",
+      "description": "Stale proposal resubmission is rejected; behavior unchanged",
+      "expected": "stale apply returns False; behavior stays 'report_unknown'",
+      "actual": "apply=False, act='report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "A15",
+      "description": "Base-engine audit hash chain verifies after Group A",
+      "expected": "(True, 'verified N events')",
+      "actual": "(True, 'verified 24 events')",
+      "passed": true
+    },
+    {
+      "case_id": "B1",
+      "description": "Baseline: fresh persistent agent guesses on missing evidence",
+      "expected": "guess (documented baseline)",
+      "actual": "'guess'",
+      "passed": true
+    },
+    {
+      "case_id": "B2",
+      "description": "Good correction candidate passes verification and is retained",
+      "expected": "True (candidate retained)",
+      "actual": "True",
+      "passed": true
+    },
+    {
+      "case_id": "B3",
+      "description": "Missing-evidence case 1/4 after correction",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "B4",
+      "description": "Missing-evidence case 2/4 after correction",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "B5",
+      "description": "Missing-evidence case 3/4 after correction",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "B6",
+      "description": "Missing-evidence case 4/4 after correction",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "B7",
+      "description": "Answerable case 1/4 after correction",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "B8",
+      "description": "Answerable case 2/4 after correction",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "B9",
+      "description": "Answerable case 3/4 after correction",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "B10",
+      "description": "Answerable case 4/4 after correction",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "C1",
+      "description": "Faulty always-refuse candidate rejected despite acknowledged/accepted labels",
+      "expected": "False (behavioral verification must reject it regardless of labels)",
+      "actual": "False",
+      "passed": true
+    },
+    {
+      "case_id": "C2",
+      "description": "Rollback restores the exact pre-candidate snapshot",
+      "expected": "snapshot identical to pre-candidate snapshot",
+      "actual": "identical=True",
+      "passed": true
+    },
+    {
+      "case_id": "C3",
+      "description": "After rollback: missing evidence still reports uncertainty",
+      "expected": "report_unknown (prior corrected state, not reverted to guess)",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "C4",
+      "description": "After rollback: answerable case still answers",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "C5",
+      "description": "Faulty revert-to-guess candidate rejected and rolled back",
+      "expected": "False and snapshot unchanged",
+      "actual": "commit=False, unchanged=True",
+      "passed": true
+    },
+    {
+      "case_id": "C6",
+      "description": "Malformed empty candidate cannot take effect; durable state intact",
+      "expected": "rejected (False or exception), durable state unchanged, audit chain valid",
+      "actual": "raised KeyError: 'missing_evidence'; durable state unchanged=True; chain=(True, 'verified 42 events'); in-memory snapshot equals pre-candidate snapshot=False",
+      "passed": true
+    },
+    {
+      "case_id": "C7",
+      "description": "Persistent audit chain verifies after faulty-candidate group",
+      "expected": "(True, ...)",
+      "actual": "(True, 'verified 42 events')",
+      "passed": true
+    },
+    {
+      "case_id": "D1",
+      "description": "Re-initialization restores state (state survives restart)",
+      "expected": "snapshot equals the pre-restart durable snapshot",
+      "actual": "equal=True",
+      "passed": true
+    },
+    {
+      "case_id": "D2",
+      "description": "Audit history survives re-initialization (append-only, chain valid)",
+      "expected": "history preserved (byte prefix), events appended, chain valid",
+      "actual": "byte_prefix_preserved=True, event_count_grew=True, RESTART_RESTORED_recorded=True, chain=(True, 'verified 43 events')",
+      "passed": true
+    },
+    {
+      "case_id": "D3",
+      "description": "After restart: missing evidence reports uncertainty",
+      "expected": "report_unknown",
+      "actual": "'report_unknown'",
+      "passed": true
+    },
+    {
+      "case_id": "D4",
+      "description": "After restart: answerable case still answers",
+      "expected": "answer_from_evidence",
+      "actual": "'answer_from_evidence'",
+      "passed": true
+    },
+    {
+      "case_id": "D5",
+      "description": "Second re-initialization: audit still append-only, chain valid",
+      "expected": "append-only across second restart; chain valid; state stable",
+      "actual": "byte_prefix_preserved=True, event_count_grew=True, state_stable_across_restart=True, chain=(True, 'verified 46 events')",
+      "passed": true
+    },
+    {
+      "case_id": "D6",
+      "description": "Base engine: audit history survives re-initialization (gap probe)",
+      "expected": "prior audit events survive re-initialization",
+      "actual": "events_before=7, events_after=1, chain=(True, 'verified 1 events')",
+      "passed": false
+    },
+    {
+      "case_id": "D7",
+      "description": "Base engine: corrected behavior survives re-initialization (gap probe)",
+      "expected": "report_unknown (corrected state survives restart)",
+      "actual": "'guess'",
+      "passed": false
+    }
+  ]
+}
