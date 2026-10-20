@@ -1,0 +1,14 @@
+{
+  "title": "RRE Evidence Sufficiency Sealed Dossier Set v1",
+  "hash_algorithm": "SHA-256",
+  "hash_scope": "UTF-8 bytes of canonical JSON object {title,dossiers,ground_truth_key}; keys sorted lexicographically; separators ',' and ':'; ensure_ascii=False; no trailing newline.",
+  "sha256": "f4a1e052342ddd4b341547910ead877a39fdf7eeb0f56519011d51b0a53947e9",
+  "dossier_count": 20,
+  "group_counts": {
+    "A_plainly_present": 5,
+    "B_buried_answer": 5,
+    "C_absent_answer": 5,
+    "D_conflicting_sources": 5
+  },
+  "protocol": "Commit this manifest before evaluation. Do not alter dossier_set.json or ground_truth_key.json after publishing this hash. Keep the key unavailable to the evaluated agent and evaluator until scoring is complete."
+}

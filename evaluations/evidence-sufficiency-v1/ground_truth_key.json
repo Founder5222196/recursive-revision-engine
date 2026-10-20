@@ -1,0 +1,115 @@
+{
+  "title": "RRE Evidence Sufficiency Sealed Dossier Set v1",
+  "ground_truth_key": [
+    {
+      "id": "P1",
+      "correct_behavior": "answer",
+      "answer": "$4,800"
+    },
+    {
+      "id": "P2",
+      "correct_behavior": "answer",
+      "answer": "Room 214"
+    },
+    {
+      "id": "P3",
+      "correct_behavior": "answer",
+      "answer": "Nia Patel"
+    },
+    {
+      "id": "P4",
+      "correct_behavior": "answer",
+      "answer": "24 V DC"
+    },
+    {
+      "id": "P5",
+      "correct_behavior": "answer",
+      "answer": "30 March"
+    },
+    {
+      "id": "B1",
+      "correct_behavior": "answer",
+      "answer": "PO-48319"
+    },
+    {
+      "id": "B2",
+      "correct_behavior": "answer",
+      "answer": "21.6°C"
+    },
+    {
+      "id": "B3",
+      "correct_behavior": "answer",
+      "answer": "Wichita, Kansas"
+    },
+    {
+      "id": "B4",
+      "correct_behavior": "answer",
+      "answer": "FX-210B"
+    },
+    {
+      "id": "B5",
+      "correct_behavior": "answer",
+      "answer": "Tuesday, 22 September, by 11:00 AM local time"
+    },
+    {
+      "id": "C1",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "The individual score is absent; aggregate statistics do not determine it."
+    },
+    {
+      "id": "C2",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "Execution status and effective date do not establish the signature date."
+    },
+    {
+      "id": "C3",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "The winner is only in a missing attachment; the brief does not name it."
+    },
+    {
+      "id": "C4",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "Submitted and eligible expense totals do not establish the employee-level amount paid."
+    },
+    {
+      "id": "C5",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "The root-cause analysis is pending and no cause is supplied."
+    },
+    {
+      "id": "D1",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "Two apparently authoritative records conflict; no precedence rule resolves them."
+    },
+    {
+      "id": "D2",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "The accepted quantities conflict for the same shipment."
+    },
+    {
+      "id": "D3",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "Two prices conflict for the same account and tier."
+    },
+    {
+      "id": "D4",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "The production-approved versions conflict with no supersession information."
+    },
+    {
+      "id": "D5",
+      "correct_behavior": "abstain",
+      "answer": null,
+      "rationale": "The final decision records conflict and neither supersedes the other."
+    }
+  ]
+}
