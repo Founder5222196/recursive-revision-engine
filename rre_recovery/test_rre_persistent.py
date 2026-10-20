@@ -41,3 +41,34 @@ class TestPersistentRRE(unittest.TestCase):
         self.assertTrue(verify_chain(self.audit)[0])
 
 if __name__=='__main__': unittest.main(verbosity=2)
+
+class TestAdversarialIsolation(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
+        root=Path(self.tmp.name); self.r=PersistentRRE(root/'state.json',root/'audit.jsonl')
+        self.r.commit_candidate({'missing_evidence':'report_unknown'},'baseline')
+
+    def assert_rejected_candidate_preserves_live_behavior(self, candidate):
+        before=self.r.snapshot()
+        behavior_before=(self.r.act(True),self.r.act(False))
+        durable_before=(self.r.state_path.read_bytes(),)
+        self.assertFalse(self.r.commit_candidate(candidate,'adversarial'))
+        self.assertEqual(self.r.snapshot(),before)
+        self.assertEqual((self.r.act(True),self.r.act(False)),behavior_before)
+        self.assertEqual(self.r.state_path.read_bytes(),durable_before[0])
+
+    def test_rejected_empty_candidate_preserves_snapshot_and_behavior_without_restart(self):
+        self.assert_rejected_candidate_preserves_live_behavior({})
+
+    def test_rejected_always_refuse_candidate_preserves_snapshot_and_behavior_without_restart(self):
+        self.assert_rejected_candidate_preserves_live_behavior({'missing_evidence':'always_refuse'})
+
+    def test_rejected_revert_to_guess_candidate_preserves_snapshot_and_behavior_without_restart(self):
+        self.assert_rejected_candidate_preserves_live_behavior({'missing_evidence':'guess'})
+
+    def test_captured_snapshot_is_deeply_frozen_against_later_live_changes(self):
+        captured=self.r.snapshot(); frozen=json.dumps(captured,sort_keys=True)
+        self.r.commit_candidate({'missing_evidence':'report_unknown'},'another-valid-commit')
+        self.r.rules['extra']={'nested':['later mutation']}
+        self.assertEqual(json.dumps(captured,sort_keys=True),frozen)
+        self.assertNotIn('extra',captured['rules'])

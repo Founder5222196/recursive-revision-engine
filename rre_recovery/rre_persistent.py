@@ -1,6 +1,6 @@
 """RRE persistence/adversarial rollback add-on; leaves rre_minimal.py untouched."""
 from __future__ import annotations
-import hashlib, json, os
+import copy, hashlib, json, os
 from pathlib import Path
 from typing import Any
 
@@ -65,24 +65,33 @@ class PersistentRRE:
         action = self.rules["missing_evidence"] if evidence_missing else "answer_from_evidence"
         self._record("OBSERVE", {"version":self.version,"version_id":self.version_id,"evidence_missing":evidence_missing,"actual_action":action})
         return action
-    def snapshot(self): return {"version":self.version,"version_id":self.version_id,"rules":dict(self.rules)}
+    def snapshot(self): return copy.deepcopy({"version":self.version,"version_id":self.version_id,"rules":self.rules})
     def commit_candidate(self, candidate_rules: dict[str,str], label: str, acknowledged=False, accepted=False):
-        before=self.snapshot(); candidate={"rules":dict(candidate_rules),"label":label,"acknowledged":acknowledged,"accepted":accepted}
-        # Deliberately activate the candidate in memory for verification, but do not
-        # persist it before it passes. This exercises an actual working-state rollback.
-        self.rules=dict(candidate_rules)
-        missing=[self.act(True) for _ in range(4)]
-        answerable=[self.act(False) for _ in range(4)]
-        passed=all(x=="report_unknown" for x in missing) and all(x=="answer_from_evidence" for x in answerable)
+        # Snapshot the caller's proposal before validation. Never install it in live
+        # state until isolated behavioral verification has succeeded.
+        before = self.snapshot()
+        try:
+            proposed = copy.deepcopy(candidate_rules)
+            well_formed = (isinstance(proposed, dict)
+                           and proposed == {"missing_evidence": "report_unknown"})
+        except Exception:
+            proposed, well_formed = {}, False
+        candidate={"rules":proposed,"label":label,"acknowledged":acknowledged,"accepted":accepted}
+        missing=[self._act_pure(proposed, True) for _ in range(4)] if well_formed else []
+        answerable=[self._act_pure(proposed, False) for _ in range(4)] if well_formed else []
+        passed=well_formed and all(x=="report_unknown" for x in missing) and all(x=="answer_from_evidence" for x in answerable)
         self._record("CANDIDATE_VERIFIED", {"base_version_id":before["version_id"],"candidate":candidate,"missing_actions":missing,"answerable_actions":answerable,"passed":passed})
         if passed:
-            self.version += 1; self.version_id=self._version_id(self.version,self.rules); self._save()
+            # Publish one verified revision; state-file replacement is atomic.
+            self.rules = copy.deepcopy(proposed)
+            self.version = before["version"] + 1
+            self.version_id = self._version_id(self.version, self.rules)
+            self._save()
             self._record("CANDIDATE_RETAINED", {"before":before,"after":self.snapshot()})
         else:
-            failed_snapshot={"version":self.version,"version_id":self.version_id,"rules":dict(self.rules)}
-            self.version=before["version"]; self.version_id=before["version_id"]; self.rules=dict(before["rules"])
-            self._save()
-            self._record("ROLLBACK_APPLIED", {"failed_candidate":candidate,"failed_working_state":failed_snapshot,"restored":self.snapshot(),"reason":"held-out behavioral verification failed; labels cannot override evidence"})
+            # Rejection is observational only: do not rewrite durable state or
+            # restore fields, because none were changed in the first place.
+            self._record("CANDIDATE_REJECTED", {"candidate":candidate,"restored":self.snapshot(),"reason":"malformed candidate or held-out behavioral verification failed; labels cannot override evidence"})
         return passed
     @staticmethod
     def _act_pure(rules, missing): return rules["missing_evidence"] if missing else "answer_from_evidence"

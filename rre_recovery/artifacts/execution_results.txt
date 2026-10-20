@@ -8,6 +8,10 @@ COMMAND: python -m unittest -v test_rre_persistent.py
 EXIT: 0
 STDOUT:
 STDERR:
+test_captured_snapshot_is_deeply_frozen_against_later_live_changes (test_rre_persistent.TestAdversarialIsolation.test_captured_snapshot_is_deeply_frozen_against_later_live_changes) ... ok
+test_rejected_always_refuse_candidate_preserves_snapshot_and_behavior_without_restart (test_rre_persistent.TestAdversarialIsolation.test_rejected_always_refuse_candidate_preserves_snapshot_and_behavior_without_restart) ... ok
+test_rejected_empty_candidate_preserves_snapshot_and_behavior_without_restart (test_rre_persistent.TestAdversarialIsolation.test_rejected_empty_candidate_preserves_snapshot_and_behavior_without_restart) ... ok
+test_rejected_revert_to_guess_candidate_preserves_snapshot_and_behavior_without_restart (test_rre_persistent.TestAdversarialIsolation.test_rejected_revert_to_guess_candidate_preserves_snapshot_and_behavior_without_restart) ... ok
 test_acknowledgment_acceptance_or_relabeling_cannot_override_failed_verification (test_rre_persistent.TestPersistentRRE.test_acknowledgment_acceptance_or_relabeling_cannot_override_failed_verification) ... ok
 test_audit_chain_continues_verifiably_across_restart_boundary (test_rre_persistent.TestPersistentRRE.test_audit_chain_continues_verifiably_across_restart_boundary) ... ok
 test_failed_candidate_is_not_retained_as_working_version (test_rre_persistent.TestPersistentRRE.test_failed_candidate_is_not_retained_as_working_version) ... ok
@@ -17,7 +21,7 @@ test_restart_restores_rules_and_version_identity (test_rre_persistent.TestPersis
 test_rollback_preserves_prior_rules_version_and_evaluator_score (test_rre_persistent.TestPersistentRRE.test_rollback_preserves_prior_rules_version_and_evaluator_score) ... ok
 
 ----------------------------------------------------------------------
-Ran 7 tests in 0.041s
+Ran 11 tests in 0.023s
 
 OK
 
@@ -136,8 +140,8 @@ DEMO SUMMARY:
   },
   "audit_chain": {
     "ok": true,
-    "message": "verified 38 events",
-    "events": 38
+    "message": "verified 22 events",
+    "events": 22
   },
   "all_commands_passed": true
 }
