@@ -1,0 +1,148 @@
+{
+  "add_on_tests": {
+    "returncode": 0,
+    "stderr": "test_acknowledgment_acceptance_or_relabeling_cannot_override_failed_verification (test_rre_persistent.TestPersistentRRE.test_acknowledgment_acceptance_or_relabeling_cannot_override_failed_verification) ... ok\ntest_audit_chain_continues_verifiably_across_restart_boundary (test_rre_persistent.TestPersistentRRE.test_audit_chain_continues_verifiably_across_restart_boundary) ... ok\ntest_failed_candidate_is_not_retained_as_working_version (test_rre_persistent.TestPersistentRRE.test_failed_candidate_is_not_retained_as_working_version) ... ok\ntest_faulty_candidate_fails_heldout_verification (test_rre_persistent.TestPersistentRRE.test_faulty_candidate_fails_heldout_verification) ... ok\ntest_initialization_does_not_truncate_existing_audit_history (test_rre_persistent.TestPersistentRRE.test_initialization_does_not_truncate_existing_audit_history) ... ok\ntest_restart_restores_rules_and_version_identity (test_rre_persistent.TestPersistentRRE.test_restart_restores_rules_and_version_identity) ... ok\ntest_rollback_preserves_prior_rules_version_and_evaluator_score (test_rre_persistent.TestPersistentRRE.test_rollback_preserves_prior_rules_version_and_evaluator_score) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.041s\n\nOK\n",
+    "stdout": ""
+  },
+  "all_commands_passed": true,
+  "audit_chain": {
+    "events": 38,
+    "message": "verified 38 events",
+    "ok": true
+  },
+  "audit_sha256": "d1bb78b242dea02340031ce56b465385f1fb84c28586ac1dbfd2cea49e3a6056",
+  "existing_modules_changed": [],
+  "faulty_candidate_passed": false,
+  "good_candidate_retained": true,
+  "known_good_before_restart": {
+    "rules": {
+      "missing_evidence": "report_unknown"
+    },
+    "version": 2,
+    "version_id": "v2-c39df6efe7766c4d"
+  },
+  "known_good_evaluator_after_bad_candidate": {
+    "cases": [
+      {
+        "actual": "report_unknown",
+        "case": "missing_1",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "report_unknown",
+        "case": "missing_2",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "report_unknown",
+        "case": "missing_3",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "report_unknown",
+        "case": "missing_4",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_1",
+        "expected": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_2",
+        "expected": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_3",
+        "expected": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_4",
+        "expected": "answer_from_evidence",
+        "passed": true
+      }
+    ],
+    "passed": 8,
+    "total": 8
+  },
+  "known_good_evaluator_before_bad_candidate": {
+    "cases": [
+      {
+        "actual": "report_unknown",
+        "case": "missing_1",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "report_unknown",
+        "case": "missing_2",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "report_unknown",
+        "case": "missing_3",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "report_unknown",
+        "case": "missing_4",
+        "expected": "report_unknown",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_1",
+        "expected": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_2",
+        "expected": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_3",
+        "expected": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "actual": "answer_from_evidence",
+        "case": "answerable_4",
+        "expected": "answer_from_evidence",
+        "passed": true
+      }
+    ],
+    "passed": 8,
+    "total": 8
+  },
+  "milestone": "RRE persistent state + adversarial revision + rollback",
+  "original_tests": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "ALL 4 TESTS PASSED\n"
+  },
+  "recovered_source_note": "rre_heldout_eval.py was reconstructed from the prior conversation summary because its source file was not found in the accessible Library; rre_minimal.py and test_rre_minimal.py are byte-preserved.",
+  "restored_after_restart": {
+    "rules": {
+      "missing_evidence": "report_unknown"
+    },
+    "version": 2,
+    "version_id": "v2-c39df6efe7766c4d"
+  },
+  "same_state_after_fault": true,
+  "state_sha256": "21fc9b0049d1975b97aba62ec7b1bbfc96239c9ac18d8ea59e8716fe2d5090b3"
+}

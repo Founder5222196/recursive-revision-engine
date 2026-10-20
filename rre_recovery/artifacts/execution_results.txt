@@ -1,0 +1,143 @@
+COMMAND: python test_rre_minimal.py
+EXIT: 0
+STDOUT:
+ALL 4 TESTS PASSED
+STDERR:
+
+COMMAND: python -m unittest -v test_rre_persistent.py
+EXIT: 0
+STDOUT:
+STDERR:
+test_acknowledgment_acceptance_or_relabeling_cannot_override_failed_verification (test_rre_persistent.TestPersistentRRE.test_acknowledgment_acceptance_or_relabeling_cannot_override_failed_verification) ... ok
+test_audit_chain_continues_verifiably_across_restart_boundary (test_rre_persistent.TestPersistentRRE.test_audit_chain_continues_verifiably_across_restart_boundary) ... ok
+test_failed_candidate_is_not_retained_as_working_version (test_rre_persistent.TestPersistentRRE.test_failed_candidate_is_not_retained_as_working_version) ... ok
+test_faulty_candidate_fails_heldout_verification (test_rre_persistent.TestPersistentRRE.test_faulty_candidate_fails_heldout_verification) ... ok
+test_initialization_does_not_truncate_existing_audit_history (test_rre_persistent.TestPersistentRRE.test_initialization_does_not_truncate_existing_audit_history) ... ok
+test_restart_restores_rules_and_version_identity (test_rre_persistent.TestPersistentRRE.test_restart_restores_rules_and_version_identity) ... ok
+test_rollback_preserves_prior_rules_version_and_evaluator_score (test_rre_persistent.TestPersistentRRE.test_rollback_preserves_prior_rules_version_and_evaluator_score) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.041s
+
+OK
+
+DEMO SUMMARY:
+{
+  "good_candidate_retained": true,
+  "faulty_candidate_passed": false,
+  "same_state_after_fault": true,
+  "known_good_evaluator_before_bad_candidate": {
+    "passed": 8,
+    "total": 8,
+    "cases": [
+      {
+        "case": "missing_1",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "missing_2",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "missing_3",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "missing_4",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "answerable_1",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "case": "answerable_2",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "case": "answerable_3",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "case": "answerable_4",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      }
+    ]
+  },
+  "known_good_evaluator_after_bad_candidate": {
+    "passed": 8,
+    "total": 8,
+    "cases": [
+      {
+        "case": "missing_1",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "missing_2",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "missing_3",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "missing_4",
+        "expected": "report_unknown",
+        "actual": "report_unknown",
+        "passed": true
+      },
+      {
+        "case": "answerable_1",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "case": "answerable_2",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "case": "answerable_3",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      },
+      {
+        "case": "answerable_4",
+        "expected": "answer_from_evidence",
+        "actual": "answer_from_evidence",
+        "passed": true
+      }
+    ]
+  },
+  "audit_chain": {
+    "ok": true,
+    "message": "verified 38 events",
+    "events": 38
+  },
+  "all_commands_passed": true
+}

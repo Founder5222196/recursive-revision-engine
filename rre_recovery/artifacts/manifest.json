@@ -1,0 +1,7 @@
+{
+  "package": "RRE persistent versioned state and adversarial rollback milestone",
+  "existing_source_policy": "rre_minimal.py and test_rre_minimal.py copied unchanged from Library source",
+  "new_files": ["rre_persistent.py", "rre_heldout_eval.py", "test_rre_persistent.py", "run_milestone.py", "README_ADDON.md"],
+  "generated_artifacts": ["milestone_report.json", "milestone_audit.jsonl", "working_state.json", "execution_results.txt", "source_sha256.txt"],
+  "limitations": ["Held-out evaluator source was reconstructed from conversation description because prior source was not found in accessible Library.", "Test ownership remains with the project author; this is not an independent evaluation."]
+}
