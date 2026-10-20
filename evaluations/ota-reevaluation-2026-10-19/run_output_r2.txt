@@ -1,0 +1,145 @@
+==============================================================================
+Independent black-box evaluation, round two: RRE correction mechanism
+Target: Founder5222196/recursive-revision-engine @ c218b5f
+==============================================================================
+[PASS] R1 Module binding: rre_minimal resolves to the repository ROOT copy (not rre_recovery/)
+        expected: repository ROOT rre_minimal.py
+        actual:   /tmp/r2_run/rre_minimal.py
+[PASS] R2 Module binding: rre_persistent resolves to rre_recovery/
+        expected: rre_recovery/rre_persistent.py
+        actual:   /tmp/r2_run/rre_recovery/rre_persistent.py
+[PASS] A1 Baseline: fresh agent guesses on missing evidence
+        expected: guess (the documented faulty rule)
+        actual:   'guess'
+[PASS] A2 Two acknowledgments do not change behavior
+        expected: guess (acknowledgment alone must not change behavior)
+        actual:   'guess'
+[PASS] A3 Apply without named approval is rejected; behavior unchanged
+        expected: apply returns False; behavior stays 'guess'
+        actual:   apply=False, act='guess'
+[PASS] A4 Authorized apply of the correction succeeds
+        expected: True
+        actual:   True
+[PASS] A5 Missing-evidence case 1/4: must report uncertainty
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] A6 Missing-evidence case 2/4: must report uncertainty
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] A7 Missing-evidence case 3/4: must report uncertainty
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] A8 Missing-evidence case 4/4: must report uncertainty
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] A9 Rich-looking text is still treated as missing when the flag says so
+        expected: report_unknown (per the public interface contract the evidence_missing flag governs the action)
+        actual:   'report_unknown'
+[PASS] A10 Answerable case 1/4: must still answer from evidence
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] A11 Answerable case 2/4: must still answer from evidence
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] A12 Answerable case 3/4: must still answer from evidence
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] A13 Answerable case 4/4: must still answer from evidence
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] A14 Stale proposal resubmission is rejected; behavior unchanged
+        expected: stale apply returns False; behavior stays 'report_unknown'
+        actual:   apply=False, act='report_unknown'
+[PASS] A15 Base-engine audit hash chain verifies after Group A
+        expected: (True, 'verified N events')
+        actual:   (True, 'verified 24 events')
+[PASS] B1 Baseline: fresh persistent agent guesses on missing evidence
+        expected: guess (documented baseline)
+        actual:   'guess'
+[PASS] B2 Good correction candidate passes verification and is retained
+        expected: True (candidate retained)
+        actual:   True
+[PASS] B3 Missing-evidence case 1/4 after correction
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] B4 Missing-evidence case 2/4 after correction
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] B5 Missing-evidence case 3/4 after correction
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] B6 Missing-evidence case 4/4 after correction
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] B7 Answerable case 1/4 after correction
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] B8 Answerable case 2/4 after correction
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] B9 Answerable case 3/4 after correction
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] B10 Answerable case 4/4 after correction
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] C1 Faulty always-refuse candidate rejected despite acknowledged/accepted labels
+        expected: False (behavioral verification must reject it regardless of labels)
+        actual:   False
+[PASS] C2 Rollback restores the exact pre-candidate snapshot
+        expected: snapshot identical to pre-candidate snapshot
+        actual:   identical=True
+[PASS] C3 After rollback: missing evidence still reports uncertainty
+        expected: report_unknown (prior corrected state, not reverted to guess)
+        actual:   'report_unknown'
+[PASS] C4 After rollback: answerable case still answers
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] C5 Faulty revert-to-guess candidate rejected and rolled back
+        expected: False and snapshot unchanged
+        actual:   commit=False, unchanged=True
+[PASS] C6 Malformed empty candidate cannot take effect; durable state intact
+        expected: rejected (False or exception), durable state unchanged, audit chain valid
+        actual:   raised KeyError: 'missing_evidence'; durable state unchanged=True; chain=(True, 'verified 42 events'); in-memory snapshot equals pre-candidate snapshot=False
+[PASS] C7 Persistent audit chain verifies after faulty-candidate group
+        expected: (True, ...)
+        actual:   (True, 'verified 42 events')
+[FAIL] D1 Re-initialization restores persistent state (state survives restart)
+        expected: snapshot equals the pre-restart durable snapshot
+        actual:   equal=False
+[PASS] D2 Persistent audit history survives re-initialization (append-only, chain valid)
+        expected: history preserved (byte prefix), events appended, chain valid
+        actual:   byte_prefix_preserved=True, event_count_grew=True, RESTART_RESTORED_recorded=True, chain=(True, 'verified 43 events')
+[PASS] D3 After restart (persistent layer): missing evidence reports uncertainty
+        expected: report_unknown
+        actual:   'report_unknown'
+[PASS] D4 After restart (persistent layer): answerable case still answers
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] D5 Second re-initialization (persistent layer): audit still append-only, chain valid
+        expected: append-only across second restart; chain valid; state stable
+        actual:   byte_prefix_preserved=True, event_count_grew=True, state_stable_across_restart=True, chain=(True, 'verified 46 events')
+[PASS] D6 BASE ENGINE: audit history survives re-initialization
+        expected: prior audit bytes survive re-initialization (byte prefix), events appended, chain valid
+        actual:   byte_prefix_preserved=True, events_before=7, events_after=8, chain=(True, 'verified 8 events')
+[PASS] D7 BASE ENGINE: corrected behavior survives re-initialization
+        expected: report_unknown (corrected state survives restart)
+        actual:   'report_unknown'
+[PASS] D8 BASE ENGINE: answerable behavior survives re-initialization
+        expected: answer_from_evidence
+        actual:   'answer_from_evidence'
+[PASS] D9 BASE ENGINE: second re-initialization is append-only; corrected behavior persists
+        expected: append-only across second restart; still report_unknown; chain valid
+        actual:   byte_prefix_preserved=True, act='report_unknown', chain=(True, 'verified 11 events')
+[PASS] D10 BASE ENGINE: without the sidecar, state is rebuilt from the audit history and behavior is still corrected
+        expected: state reconstructed from audit alone: report_unknown; history preserved; chain valid
+        actual:   act='report_unknown', byte_prefix_preserved=True, chain=(True, 'verified 8 events'), sidecar_recreated=False
+[PASS] D11 BASE ENGINE: re-initialization on a corrupted audit refuses and preserves the evidence untouched
+        expected: constructor refuses to resume (raises); tampered audit left byte-identical; chain check fails
+        actual:   constructor raised ValueError: cannot resume: invalid audit chain at line 3; corrupt_bytes_unchanged=True; chain check on tampered log=(False, 'event hash mismatch at line 3')
+==============================================================================
+TOTAL: 45  PASSED: 44  FAILED: 1
+FAILED CASES: D1
+rre_minimal.__file__ = /tmp/r2_run/rre_minimal.py
+rre_persistent.__file__ = /tmp/r2_run/rre_recovery/rre_persistent.py
+Report: /tmp/r2_run/ota_independent_eval_report_r2.json
