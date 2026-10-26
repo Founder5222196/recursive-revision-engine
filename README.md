@@ -2,6 +2,8 @@
 
 **Status: early prototype. Unverified.**
 
+**Status update, 2026-10-26:** the Evidence Sufficiency v2 instrument in this repository has since been evaluated on a sealed, independently authored 100-dossier set and **passed (99/100)** — see [`evaluations/evidence-sufficiency-v2/RUN_RESULTS.md`](evaluations/evidence-sufficiency-v2/RUN_RESULTS.md). The line above describes the prototype as originally published; the record below it is the current one.
+
 This repository publishes the Recursive Revision Engine as it actually exists today: a real, working starting point, published to establish a public record of the work and its development — not as a finished or verified system.
 
 Publishing this prototype does **not** establish that the system works as intended. Testing will establish that, and this repository will not claim verification that has not been performed.
@@ -39,6 +41,13 @@ The specification was delivered unexecuted — its author stated plainly that th
 - 2026-10-19, Python 3.12.3: the D6/D7 restart-persistence fix to `rre_minimal.py` was delivered and run here: original tests `ALL 4 TESTS PASSED`; `test_rre_restart.py` → PASS D6, PASS D7; the demo on a fresh path reproduces `demo_audit.jsonl` byte-identically (18 events) and now also writes an `audit.jsonl.state.json` sidecar; the v0.2 held-out evaluator on fresh paths still scores 8/8 with a 13-event chain. Two record notes: (1) re-running the v0.2 evaluator in place now *appends* to its existing audit file (resume semantics) instead of regenerating it, so its shipped artifacts are left as originally generated; (2) the sealed OTA harness resolves `rre_minimal` to the copy bundled in `rre_recovery/` (its `sys.path` order), so a valid re-evaluation must pin the root module — locally, with the root engine bound, the sealed cases pass 39/39; the formal fresh-seal re-evaluation followed: 45 cases, 44 passed — D6/D7 and the new D10/D11 probes pass; the single failure (D1) traced to a rejected empty candidate emptying the persistent layer's *in-memory* rules during case C6 while durable state stayed correct (the post-restart snapshot matched the durable snapshot exactly). That defect has since been fixed by the candidate-isolation patch recorded above and confirmed by the round-three evaluation (47/47 under a fresh seal, D1 and the direct defect probes C8/C9 passing).
 
 That verifies the delivered code runs, passes its own tests, and reproduces its recorded demonstration exactly. At delivery it was **not** an independent evaluation: the tests were the implementation's own. An authorship-independent evaluation has since been run — see the `evaluations/` record below and the execution record.
+
+## Verify it yourself
+
+The two 2026-10-26 results recorded in this repository can be re-checked from a fresh clone:
+
+- **Evidence Sufficiency Claim v2 — PASS, 99/100** ([`evaluations/evidence-sufficiency-v2/RUN_RESULTS.md`](evaluations/evidence-sufficiency-v2/RUN_RESULTS.md)). The released instrument's own suites: `cd builds/evidence-sufficiency-v2 && python3 -m unittest test_evidence_judge.py test_rre_minimal.py test_correction_integrity.py` → 13 tests, OK. The run was replay-verified by the record keeper before scoring: every extraction record binds by SHA-256 to the evaluator's sealed dossiers, and replaying the records through the released adapter reproduces all 100 verdicts exactly. The evaluation set and its key were never committed here (evaluator custody, per the v2 freeze design); RUN_RESULTS carries every item's binary outcome and the scoring adjudications.
+- **Economic Governance Kernel v0.2** ([`builds/economic-governance-v0.2/`](builds/economic-governance-v0.2/)): `python3 -m unittest test_contribution_bridge.py test_economic_governance.py` in that directory → 31 tests, OK (21 governance + 10 prototype regression). Per-file SHA-256 values are in its `BUILD_MANIFEST.md`; the record keeper's execution is recorded in its `VERIFICATION.md`.
 
 ## What is missing or unverified
 
