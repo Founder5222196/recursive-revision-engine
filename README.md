@@ -12,12 +12,16 @@ Publishing this prototype does **not** establish that the system works as intend
 
 RRE is an engine for recursive revision: work is revised in rounds, each revision recorded, so the progression from the first draft of an idea to its tested form stays visible and auditable.
 
+**Revision update, 2026-11-22:** RRE now distinguishes **Stated Correction**, **Replayed Correction**, **Installed Revision**, and **Carried Revision**. The extended sequence is **Contradiction → Locate → Revise → Replay → Persist → Attest → Carry Forward**. The governing test is whether a verified correction continues to govern later relevant decisions without requiring the same correction to be purchased again. See [`RRE_CARRY_FORWARD.md`](RRE_CARRY_FORWARD.md).
+
 ## What is implemented
 
 - [`SPEC.md`](SPEC.md) — the Prototype 0.1 specification and implementation contract, as delivered.
 - [`rre_minimal.py`](rre_minimal.py) — the reference implementation: a versioned working model, a revision loop (observe → propose → authority review → apply → verify), per-version rule snapshots, and a hash-chained JSONL audit log with a standalone chain verifier. Python 3.10+, standard library only.
 - [`test_rre_minimal.py`](test_rre_minimal.py) — four named tests: acknowledgment-is-not-revision, authority enforcement, stale proposals, and audit-chain tampering.
 - [`test_rre_restart.py`](test_rre_restart.py) — the D6/D7 regression tests from the independent evaluation: restart preserves audit history; restart preserves corrected behavior.
+- [`RRE_CARRY_FORWARD.md`](RRE_CARRY_FORWARD.md) — the revision-status and Carry Forward addendum: Stated, Replayed, Installed, and Carried revision; the extended RRE sequence through Carry Forward; and the no-reset-without-a-defeater rule.
+- [`test_rre_carry_forward.py`](test_rre_carry_forward.py) — three regression tests for later analogous behavior without re-purchase, restart carry-forward, and rejection of an unsupported reset.
 - [`demo_audit.jsonl`](demo_audit.jsonl) — the author's shipped demonstration audit (18 hash-chained events).
 - [`audit.jsonl`](audit.jsonl) — the audit artifact produced by the local execution recorded below. It is byte-identical to `demo_audit.jsonl`: the demonstration is deterministic, and running the code reproduces the author's recorded chain exactly.
 - [`rre_heldout_eval.py`](rre_heldout_eval.py) — the v0.2 held-out evaluator add-on: a separate black-box evaluator that tests the agent through its public `act()` interface on held-out cases — missing-evidence cases (must report uncertainty) and answerable cases (must still answer) — and rejects a deliberately faulty always-refuse candidate. See [`README_RRE_0.2_eval.md`](README_RRE_0.2_eval.md).
@@ -50,6 +54,8 @@ The two 2026-10-26 results recorded in this repository can be re-checked from a 
 - **Economic Governance Kernel v0.2** ([`builds/economic-governance-v0.2/`](builds/economic-governance-v0.2/)): `python3 -m unittest test_contribution_bridge.py test_economic_governance.py` in that directory → 31 tests, OK (21 governance + 10 prototype regression). Per-file SHA-256 values are in its `BUILD_MANIFEST.md`; the record keeper's execution is recorded in its `VERIFICATION.md`.
 
 ## What is missing or unverified
+
+- **Carry Forward beyond the controlled rule domain** — the new regression tests exercise Carry Forward for the prototype's `missing_evidence` rule. That does not establish general carry-forward across unrelated rules, domains, models, institutions, or human evaluators.
 
 Named plainly, so nobody has to guess:
 
